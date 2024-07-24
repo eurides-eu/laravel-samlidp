@@ -89,7 +89,7 @@ class SamlSso implements SamlContract
                             auth($this->guard)
                                 ->user()
                                 ->__get(config('samlidp.email_field', 'email')),
-                            SamlConstants::NAME_ID_FORMAT_EMAIL
+                            SamlConstants::NAME_ID_FORMAT_PERSISTENT
                         )
                     )
                     ->addSubjectConfirmation(

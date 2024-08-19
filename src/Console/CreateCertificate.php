@@ -54,14 +54,25 @@ class CreateCertificate extends Command
 
         $key = sprintf('%s/%s', $storagePath, $keyname);
         $cert = sprintf('%s/%s', $storagePath, $certname);
-        $question = 'The name chosen for the PEM files already exist. Would you like to overwrite existing PEM files?';
-        if ((!file_exists($key) && !file_exists($cert)) || $this->confirm($question)) {
+        if ($this->canCreateFiles($key, $cert)) {
             $command = 'openssl req -x509 -sha256 -nodes -days %s -newkey rsa:2048 -keyout %s -out %s';
             if ($subject) {
-                $command .= ' -subj "' . $subject.'"';
+                $command .= ' -subj "' . $subject . '"';
             }
 
             exec(sprintf($command, $days, $key, $cert));
         }
+    }
+
+    protected function canCreateFiles($key, $cert)
+    {
+        $question = 'The name chosen for the PEM files already exist. Would you like to overwrite existing PEM files?';
+        $canCreate = true;
+        // If either file exists
+        if (file_exists($key) || file_exists($cert)) {
+            // Throw input question to user
+            $canCreate = $this->confirm($question);
+        }
+        return $canCreate;
     }
 }

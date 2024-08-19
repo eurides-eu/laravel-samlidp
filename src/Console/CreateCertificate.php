@@ -14,6 +14,7 @@ class CreateCertificate extends Command
     protected $signature = 'samlidp:cert
                             {--days=7300 : Number of days to add from today as the expiration date}
                             {--subject= : Subj input for OpenSSL request command}
+                            {--overwrite=0 : Overwrite existing PEM files}
                             {--keyname=key.pem : Full name of the certificate key file}
                             {--certname=cert.pem : Full name to the certificate file}';
 
@@ -70,8 +71,14 @@ class CreateCertificate extends Command
         $canCreate = true;
         // If either file exists
         if (file_exists($key) || file_exists($cert)) {
-            // Throw input question to user
-            $canCreate = $this->confirm($question);
+            $canCreate = false;
+            // If Option was set, use that value
+            if ($this->input->hasOption('overwrite')) {
+                $canCreate = boolval($this->option('overwrite'));
+            } else {
+                // Throw input question to user
+                $canCreate = $this->confirm($question);
+            }
         }
         return $canCreate;
     }
